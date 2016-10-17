@@ -69,7 +69,7 @@ And launch run <code>npm start</code>.
 
 After running your environment you should be able to see:
 
-<img src="https://lh3.googleusercontent.com/GNQrHkWoRID6VXLWrYV8r2lmxfPacSTtZcG0SIN1cXHpiILGJNmQOH9lwEydgZ8S3k1caNwIxD_sr5A=w1680-h944-rw" width="600" />
+<img src="https://www.dropbox.com/s/zqsqrmnahslecry/screen.png?dl=0" width="600" />
 
 
 
