@@ -1,4 +1,4 @@
-# angulartest
+# react-chat
 
 Code Challenge for [build a simple, anonymous chat web appplication](./Code_Challenge.pdf) running in node.js with a React front-end.
 
