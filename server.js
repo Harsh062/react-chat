@@ -2,45 +2,58 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var moment = require('moment');
 
 io.on('connection', function(socket){
   console.log('a user connected');
 
+  // Actions for a 'disconnect' event (when client's socket is closed)
   socket.on('disconnect', function(){
-    console.log('user disconnected');
-    io.emit("user:leave", { 
+    var message = { 
       message: "An user has disconnected from the server.",
-      color: "#000"
-    });
+      color: "#000",
+      time: moment().format('LT')
+    };
+    io.emit("user:leave", message);
+    console.log('user disconnected');
   });
 
-  socket.on('user-leave', function(){
-    console.log('user leave');
-    io.emit("user:leave", {
+  // Actions for a 'user-leave' event
+  socket.on('user-leave', function(color){
+    var message = {
       message: "An user has leave from the server.",
-      color: "#000"
-    });
+      color: color,
+      time: moment().format('LT')
+    };
+    io.emit("user:leave", message);
+    console.log('user leave');
   });
 
+  // Actions for a 'user-join' event
   socket.on('user-join', function(color){
-    console.log('user join', color);
-    io.emit("user:join", {
+    var message = {
       message: "An user has join to the server.",
-      color: color
-    });
+      color: color,
+      time: moment().format('LT')
+    };
+    io.emit("user:join", message);
+    console.log('user join', message);
   });
 
+  // Actions for a 'user-typing' event
   socket.on('user-typing', function(color){
-    //console.log('user typing', color);
-    socket.broadcast.emit("user:typing", {
+    var message = {
       message: "User is typing a message.",
       color: color
-    });
+    };
+    socket.broadcast.emit("user:typing", message);
   });
 
-  socket.on("new-message", function(msg){
-    console.log('user send a message', msg.message);
-    io.emit("receive-message", msg);
+  // Actions for a 'user-message' event
+  socket.on("user-message", function(msg){
+    msg.time = moment().format('LT');
+    console.log('user send a message', msg);
+    io.emit("user:message", msg);
   });
 
 

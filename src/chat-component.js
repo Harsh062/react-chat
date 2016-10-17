@@ -1,6 +1,7 @@
 var Chat = React.createClass({
   getInitialState: function(){
 
+    // IP Address & port for chat server running node app. Please change it if is required!
     var chatServerAddress = "http://10.0.0.20:3000";
 
     return {
@@ -9,7 +10,7 @@ var Chat = React.createClass({
       joined: false,
       isMessageEmpty: true,
       updates: { 
-        message:null 
+        message: null 
       },
     }
   },
@@ -17,29 +18,45 @@ var Chat = React.createClass({
   componentDidMount: function(){
     var self = this;
 
-    this.state.socket.on("receive-message", function(msg){
+    // Add new messages from server (sended by client's app)
+    this.state.socket.on("user:message", function(msg){
       var messages = self.state.messages
       messages.push(msg);
-      self.setState({messages: messages});
+      self.setState({
+        messages: messages
+      });
     });
 
+    // Interaction with UI when the server detects that a user left the chat channel
     this.state.socket.on("user:leave", function(msg){
       var messages = self.state.messages
       messages.push(msg);
-      self.setState({messages: messages, updates: "The chat feed is not available"});
+      self.setState({
+        messages: messages,
+        updates: { message: "The interaction with chat feed is not available" }
+      });
     });
 
+    // A user joined into chat
     this.state.socket.on("user:join", function(msg,color){
       var messages = self.state.messages
       messages.push(msg);
-      self.setState({messages: messages, updates: {message:null} });
+      self.setState({
+        messages: messages, 
+        updates: { message: null }
+      });
     });
 
+    // Interaction with UI when the server detects that a user is typing a message
     this.state.socket.on("user:typing", function(msg){
-      self.setState({updates: msg});
+      self.setState({
+        updates: msg
+      });
       
       setTimeout(function(){
-           self.setState({updates: {message:null} });
+        self.setState({
+          updates: { message: null }
+        });
       }.bind(self),2000);  // wait then reset updates
 
     });
@@ -53,21 +70,25 @@ var Chat = React.createClass({
     }
   },
 
+  // Action in client app when a user submit a new message
   submitMessage: function(){
     var message = document.getElementById("msg");
-    var color = localStorage.getItem('color');
 
     if(message.value !== "") {
-      this.state.socket.emit("new-message", 
+      this.state.socket.emit("user-message", 
         { 
           message: message.value,
-          color: color 
+          color: localStorage.getItem('color') 
         }
       );
       message.value = "";
+      this.setState({
+        isMessageEmpty: true
+      });
     }
   },
 
+  // Action in client app when a user join to the chat channel
   joinChatFeed: function(){
     // Generate a random color for indetify users
     var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
@@ -83,21 +104,16 @@ var Chat = React.createClass({
 
   },
 
+  // Action in client app when a user left the chat channel
   leaveChatFeed: function(){
-    // Generate a random color for indetify users
-    var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-
-    // Save color in Browser localStorage
-    localStorage.setItem('color', color);
-
-    this.state.socket.emit("user-leave", color);
+    this.state.socket.emit("user-leave", localStorage.getItem('color'));
 
     this.setState({
       joined: false,
     });
-
   },
 
+  // Action in client app when a user is typing in message field
   handleKeyPress: function(e){
     if (e.key === 'Enter') {
       this.submitMessage();
@@ -112,7 +128,6 @@ var Chat = React.createClass({
 
       var color = localStorage.getItem('color');
       this.state.socket.emit("user-typing", color);
-
     }
   },
 
@@ -124,11 +139,12 @@ var Chat = React.createClass({
       color: this.state.updates.color
     }
 
+    // Make a list of message for render
     var messages = this.state.messages.map(function(msg){
       var msgStyle = {
         color: msg.color
       }
-      return <li style={msgStyle}> {msg.message} </li>
+      return <li style={msgStyle}> ({msg.time}) {msg.message} </li>
     });
     
     return(
