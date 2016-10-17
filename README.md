@@ -4,9 +4,9 @@ Code Challenge for [build a simple, anonymous chat web appplication](./Code_Chal
 
 - [Functionality](#functionality)
   - [Libraries](#libraries)
-  - [Setup](#setup)
   - [Installation](#installation)
 - [Docs](#docs)
+  - [Setup](#setup)
   - [Demo](#demo)
 
 
@@ -28,6 +28,21 @@ Code Challenge for [build a simple, anonymous chat web appplication](./Code_Chal
   - Twitter Bootstrap
 
 
+## Installation
+
+After installing Node.JS (v5.2.0+), Git please make sure you have Bower client.
+
+<code>$ npm install -g bower</code>
+
+Being on the main project folder run:
+
+<code>$ npm install && bower install</code>
+
+And launch run <code>npm start</code>.
+
+
+## Docs
+
 ## Setup
 
 Make sure that you update <strong>server.js</strong>:
@@ -44,21 +59,6 @@ Please also update <strong>src/chat-component.js</strong>:
 <pre>var chatServerAddress = "http://10.0.0.20:3000";</pre>
 with the right IP address/hostname.
 
-
-## Installation
-
-After installing Node.JS (v5.2.0+), Git please make sure you have Bower client.
-
-<code>$ npm install -g bower</code>
-
-Being on the main project folder run:
-
-<code>$ npm install && bower install</code>
-
-And launch run <code>npm start</code>.
-
-
-## Docs
 
 ### Demo
 
