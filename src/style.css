@@ -1,0 +1,29 @@
+.join-screen {
+  padding-top: 10px;
+  text-align: center;
+}
+#feed {
+  font-size: 18px;
+  margin: 0px;
+  height: 400px;
+  overflow: scroll;
+}
+#public-chat-feed {
+  padding-top: 10px;
+}
+.updates{
+  min-height: 30px;
+  padding: 5px 10px;
+}
+.btn {
+  margin-left: 5px;
+}
+.join {
+  text-align: center;
+  margin-bottom: 10px;
+}
+#feed {
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 5px 5px;
+}

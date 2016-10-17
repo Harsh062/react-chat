@@ -1,0 +1,162 @@
+var Chat = React.createClass({
+  getInitialState: function(){
+
+    var chatServerAddress = "http://10.0.0.20:3000";
+
+    return {
+      messages: [],
+      socket: io(chatServerAddress),
+      joined: false,
+      isMessageEmpty: true,
+      updates: { 
+        message:null 
+      },
+    }
+  },
+
+  componentDidMount: function(){
+    var self = this;
+
+    this.state.socket.on("receive-message", function(msg){
+      var messages = self.state.messages
+      messages.push(msg);
+      self.setState({messages: messages});
+    });
+
+    this.state.socket.on("user:leave", function(msg){
+      var messages = self.state.messages
+      messages.push(msg);
+      self.setState({messages: messages, updates: "The chat feed is not available"});
+    });
+
+    this.state.socket.on("user:join", function(msg,color){
+      var messages = self.state.messages
+      messages.push(msg);
+      self.setState({messages: messages, updates: {message:null} });
+    });
+
+    this.state.socket.on("user:typing", function(msg){
+      self.setState({updates: msg});
+      
+      setTimeout(function(){
+           self.setState({updates: {message:null} });
+      }.bind(self),2000);  // wait then reset updates
+
+    });
+
+  },
+
+  componentDidUpdate() {
+    // When user join focus in message input
+    if (this.state.joined) {
+      this.refs.msgInput.focus()
+    }
+  },
+
+  submitMessage: function(){
+    var message = document.getElementById("msg");
+    var color = localStorage.getItem('color');
+
+    if(message.value !== "") {
+      this.state.socket.emit("new-message", 
+        { 
+          message: message.value,
+          color: color 
+        }
+      );
+      message.value = "";
+    }
+  },
+
+  joinChatFeed: function(){
+    // Generate a random color for indetify users
+    var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+
+    // Save color in Browser localStorage
+    localStorage.setItem('color', color);
+
+    this.state.socket.emit("user-join", color);
+
+    this.setState({
+      joined: true,
+    });
+
+  },
+
+  leaveChatFeed: function(){
+    // Generate a random color for indetify users
+    var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+
+    // Save color in Browser localStorage
+    localStorage.setItem('color', color);
+
+    this.state.socket.emit("user-leave", color);
+
+    this.setState({
+      joined: false,
+    });
+
+  },
+
+  handleKeyPress: function(e){
+    if (e.key === 'Enter') {
+      this.submitMessage();
+    } else {
+      var isEmpty = true;
+      if(e.target.value !== ""){
+        isEmpty = false;
+      }
+      this.setState({
+        isMessageEmpty: isEmpty
+      });
+
+      var color = localStorage.getItem('color');
+      this.state.socket.emit("user-typing", color);
+
+    }
+  },
+
+  render: function(){
+
+    var self = this;
+    // Take color for auxiliary messages
+    var updateColor = {
+      color: this.state.updates.color
+    }
+
+    var messages = this.state.messages.map(function(msg){
+      var msgStyle = {
+        color: msg.color
+      }
+      return <li style={msgStyle}> {msg.message} </li>
+    });
+    
+    return(
+      <div className="component">
+        <div className="join">
+          <button className="btn btn-primary btn-lg" disabled={this.state.joined} onClick={() => this.joinChatFeed()}>Join</button>
+        </div>
+        <div id="feed">
+          <ul id="msgs" className="list-unstyled">
+            {messages}
+          </ul>
+        </div>
+        <div className="updates">
+          <span style={updateColor} class='text-muted'>{this.state.updates.message}</span>
+        </div>
+        <div className="form-inline">
+          <div className="form-group">
+            <input id="msg" ref="msgInput" className="form-control input-lg" type="text" placeholder="Your message" disabled={!this.state.joined} onKeyPress={this.handleKeyPress}/>
+          </div>
+          <button className="btn btn-success btn-lg" disabled={this.state.isMessageEmpty} onClick={() => this.submitMessage()}>Send</button>
+          <button className="btn btn-danger btn-lg" disabled={!this.state.joined} onClick={() => this.leaveChatFeed()}>Leave</button>
+        </div>
+      </div>
+    )
+  }
+});
+
+ReactDOM.render(
+  <Chat/>,
+  document.getElementById("chat-feed")
+)

@@ -1,0 +1,45 @@
+<html>
+  <head>
+
+    <title>Chat 3.0</title>
+    <link rel="stylesheet" type="text/css" href="components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="join-screen col-md-10 col-md-offset-1 col-sm-12">
+        <div class="jumbotron">
+          <h3>Chat application using node.js, socket.io and ReactJS</h3>
+          <p>Please 'Join' to Chatroom as a guest.</p>
+        </div>
+      </div>
+      <div id="public-chat-feed" class="row">
+        <div id="chat-feed" class="col-md-8 col-md-offset-2 col-sm-12">
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script src="socket.io/socket.io.js"></script>
+  <script src="components/react/react.min.js"></script>
+  <script src="components/react/react-dom.min.js"></script>
+  <script src="components/babel/browser.min.js"></script>
+
+  <script src="components/jquery/dist/jquery.min.js"></script>
+  <script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script type="text/babel" src="chat-component.js"></script>
+  <script>
+    $(document).ready(function() {
+      
+      $("#feed").bind("DOMSubtreeModified",function() {
+        $("#feed").animate({
+            scrollTop: $("#feed")[0].scrollHeight
+        });
+      });
+
+    });
+  </script>
+
+</html>
